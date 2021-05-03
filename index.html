@@ -117,7 +117,8 @@
         border-radius: 50px;
         /* border: none; */
         outline: none;
-        width: 30%;
+        width: 120px;
+        overflow: hidden;
       }
       .hide {
         display: none !important;
@@ -189,6 +190,18 @@
           /* word-spacing: 8px; */
         }
       }
+      @keyframes buttonTag2 {
+        0% {
+        }
+        50% {
+          letter-spacing: 3px;
+          word-spacing: 4px;
+        }
+        100% {
+          /* letter-spacing: 6px; */
+          /* word-spacing: 8px; */
+        }
+      }
       .time {
         width: 150px;
         height: 100px;
@@ -202,6 +215,22 @@
         justify-content: center;
         text-align: center;
         justify-items: center;
+      }
+      .point {
+        width: 150px;
+        height: 100px;
+        color: rgb(157, 255, 0);
+        font-weight: bold;
+        /* background-color: black; */
+        position: absolute;
+        top: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        justify-items: center;
+        animation: buttonTag2 2s infinite forwards;
       }
     </style>
     <title>Document</title>
@@ -217,12 +246,19 @@
       <h1>Guess The Word Game</h1>
       <div class="gameField">
         <p class="time"></p>
+        <p class="point"></p>
         <span class="sms"></span>
         <input class="input hide" type="text" placeholder="Type here" />
         <button class="submit">Start</button>
+        <audio id="clap" src="audio/clap.mp3"></audio>
+        <audio id="right" src="audio/right.mp3"></audio>
+        <audio id="wrong" src="audio/wrong.mp3"></audio>
       </div>
     </div>
     <script>
+      const right = document.querySelector("#right");
+      const wrong = document.querySelector("#wrong");
+      const clap = document.querySelector("#clap");
       const btn = document.querySelector(".submit");
       const input = document.querySelector(".input");
       const txt = document.querySelector(".sms");
@@ -230,6 +266,7 @@
       const eng = document.querySelector(".eng");
       const prg = document.querySelector(".prg");
       const time = document.querySelector(".time");
+      const point = document.querySelector(".point");
 
       let play,
         currentWord,
@@ -238,31 +275,33 @@
         words,
         scorerun,
         counter,
-        scoreinterval;
+        scoreinterval,
+        points;
       play = false;
       scorerun = false;
       counter = 0;
+      points = 0;
       let prgw = [
         "php",
         "JavaScript",
         "Laravel",
-        "ReactJs",
-        "AngularJs",
-        "ViewJs",
-        "Python",
-        "C++",
-        "EcmaScript",
-        "Google",
-        "NodJs",
-        "MongoDB",
-        "Database",
-        "Myscl",
-        "ExpressJs",
-        "Bootstrap",
-        "comand",
-        "variable",
-        "function",
-        "DataType",
+        // "ReactJs",
+        // "AngularJs",
+        // "ViewJs",
+        // "Python",
+        // "C++",
+        // "EcmaScript",
+        // "Google",
+        // "NodJs",
+        // "MongoDB",
+        // "Database",
+        // "Myscl",
+        // "ExpressJs",
+        // "Bootstrap",
+        // "comand",
+        // "variable",
+        // "function",
+        // "DataType",
       ];
       let engw = [
         "the",
@@ -353,9 +392,15 @@
         }
         scorerun = true;
       }
-      console.log([]);
+      function capitaliz(word) {
+        const arr = word.split("");
 
+        [, ...all] = arr;
+
+        return arr[0].toUpperCase().concat(all.join(""));
+      }
       function playGame() {
+        txt.style.color = "chartreuse";
         score();
         if (!play) {
           play = true;
@@ -372,28 +417,43 @@
         } else {
           play = false;
           inputWord = input.value;
-          if (inputWord == currentWord) {
+          if (
+            inputWord == currentWord ||
+            capitaliz(inputWord) === capitaliz(currentWord)
+          ) {
             input.focus();
+            right.play();
+            txt.style.color = "chartreuse";
             txt.innerHTML = `Awesome! you done it correct (${form}) , Try next one`;
             btn.innerHTML = "Next";
             input.value = "";
             input.classList.toggle("hide");
             words = remove(form, words);
+            points++;
+            point.innerHTML = `Solved : ${points}`;
             if (words.length === 0) {
-              txt.innerHTML = `Welldone you complete all task within ${Math.round(
+              clap.play();
+
+              txt.innerHTML = `Welldone you complete total ${points} task within ${Math.round(
                 counter / 60
               )}min`;
               clearInterval(scoreinterval);
               time.innerHTML = "";
+              point.innerHTML = "";
+              points = 0;
               btn.addEventListener("click", () => {
                 window.location.reload();
               });
             }
           } else {
             input.focus();
+            wrong.play();
+            txt.style.color = "red";
             txt.innerHTML = `Sorry! boss your answer incorrect, Try again`;
             btn.innerHTML = "Again";
+
             input.classList.toggle("hide");
+            input.value = "";
           }
         }
       }
