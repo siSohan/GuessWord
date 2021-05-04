@@ -85,9 +85,9 @@
         flex-direction: column;
         color: black;
         font-family: sans-serif;
-        width: 60%;
+        width: 80%;
         overflow: hidden;
-        height: 70%;
+        height: 60%;
         background: rgba(0, 150, 75, 0.555);
         -webkit-box-shadow: 3px 8px 22px 0px rgba(43, 43, 43, 1);
         -moz-box-shadow: 3px 8px 22px 0px rgba(43, 43, 43, 1);
@@ -173,6 +173,19 @@
         background: rgb(10, 76, 78);
         font-weight: bold;
       }
+      .reset {
+        font-size: 15px;
+        /* margin-bottom: 15px; */
+        padding: 15px 10px;
+        border-radius: 50px;
+        color: orange;
+        background: rgb(10, 76, 78);
+        font-weight: bold;
+        position: absolute;
+        bottom: 0%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+      }
       button:focus,
       button:hover,
       button:active {
@@ -247,6 +260,7 @@
       </div>
       <h1>Guess The Word Game</h1>
       <div class="gameField">
+        <button class="reset hide">Reset</button>
         <p class="time"></p>
         <p class="point"></p>
         <span class="sms"></span>
@@ -269,6 +283,7 @@
       const prg = document.querySelector(".prg");
       const time = document.querySelector(".time");
       const point = document.querySelector(".point");
+      const reset = document.querySelector(".reset");
 
       let play,
         currentWord,
@@ -356,12 +371,14 @@
       ];
       eng.addEventListener("click", () => {
         promt.classList.add("hide");
+
         words = engw;
       });
       prg.addEventListener("click", () => {
         promt.classList.add("hide");
         words = prgw;
       });
+      reset.addEventListener("click", resetFunction);
       const remove = function (word, arr) {
         const nfn = arr.filter((e) => {
           return e !== word;
@@ -401,10 +418,27 @@
 
         return arr[0].toUpperCase().concat(all.join(""));
       }
+      function resetFunction() {
+        clap.play();
+        reset.classList.add("hide");
+        txt.innerHTML = `Welldone you complete total ${points} task within ${Math.round(
+          counter / 60
+        )}min`;
+        clearInterval(scoreinterval);
+        time.innerHTML = "";
+        point.innerHTML = "";
+        points = 0;
+        scorerun = false;
+        btn.innerHTML = "Home";
+        btn.addEventListener("click", () => {
+          window.location.reload();
+        });
+      }
       function playGame() {
         txt.style.color = "chartreuse";
         score();
         if (!play) {
+          reset.classList.remove("hide");
           play = true;
           btn.innerText = "Guess";
           input.classList.toggle("hide");
@@ -434,18 +468,7 @@
             points++;
             point.innerHTML = `Solved : ${points}`;
             if (words.length === 0) {
-              clap.play();
-
-              txt.innerHTML = `Welldone you complete total ${points} task within ${Math.round(
-                counter / 60
-              )}min`;
-              clearInterval(scoreinterval);
-              time.innerHTML = "";
-              point.innerHTML = "";
-              points = 0;
-              btn.addEventListener("click", () => {
-                window.location.reload();
-              });
+              resetFunction();
             }
           } else {
             input.focus();
